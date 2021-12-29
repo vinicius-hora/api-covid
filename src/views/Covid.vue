@@ -1,20 +1,36 @@
+
 <template>
+
     <v-app>
     <v-app-bar app></v-app-bar>
 
     <v-main>
-        <v-container>
-            <v-btn @click="totalCasos">Mostrar dados</v-btn>
-            <br>
-            <br>
-            <v-row >
-                <v-col cols="6">
-                    <p >Total de casos: {{casos}}</p>
-                    <p >Total de mortes: {{mortes}}</p>
-                </v-col>
-            </v-row>
-            <v-btn @click="casosPorEstado">Mostrar dados por estado</v-btn>
-            <br>
+        <v-container >
+            <div class="dark" id="div-total">
+                <v-row >
+                    <v-col cols="6">
+                          <v-btn @click="totalCasos">Mostrar total Brasil</v-btn>
+                            <br>
+                            <br>
+                            <v-row >
+                                <v-col cols="6">
+                                    <p >Total de casos: {{casos}}</p>
+                                    <p >Total de mortes: {{mortes}}</p>
+                                 </v-col>
+                            </v-row>    
+                    </v-col>
+                    <v-col cols="6">
+                        <v-btn @click="totalPais">Pesquisar pais</v-btn>
+                         <v-text-field label="Pais" v-model="pais" >{{pais}}</v-text-field>
+                         <p >Total de casos: {{casosPais}}</p>
+                         <p >Total de mortes: {{mortesPais}}</p>
+                    </v-col>
+                </v-row>
+              
+                
+                <br>
+                <v-spacer></v-spacer>
+            </div>
             <!-- funcionando com UL -->
             <!-- <ul >
                
@@ -28,12 +44,40 @@
                 </li>
               
             </ul> -->
+            <!-- funcionando com div -->
             <!-- <div v-for="(dado, id) in dados" :key="id">
                 <p>Estado: {{dado.state}}</p>
                 <p>Casos: {{dado.cases}}</p>
                 <p>mortes: {{dado.deaths}}</p>
                 <v-spacer></v-spacer>
             </div> -->
+            <div id="div-estado">
+                <v-btn @click="casosPorEstado">Mostrar dados por estado</v-btn>
+                <v-simple-table dark>
+                    <template v-slot:default>
+                    <thead>
+                        <tr>
+                        <th class="text-center">
+                            <h1>Estado</h1>
+                        </th>
+                        <th class="text-center">
+                            <h1>Casos</h1>
+                        </th>
+                        <th class="text-center">
+                            <h1>Mortes</h1>
+                        </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(dado, id) in dados" :key="id">
+                            <td>{{ dado.state}}</td>
+                            <td>{{ dado.cases.toLocaleString('pt-BR') }}</td>
+                            <td>{{ dado.deaths.toLocaleString('pt-BR') }}</td>
+                        </tr>
+                    </tbody>
+                    </template>
+                </v-simple-table>
+            </div>
         </v-container>
     </v-main>
     </v-app>
@@ -46,8 +90,8 @@
 export default ({
      data:() => ({
          //   variaves da api total
-       casos: 0,
-       mortes: 0,
+       casos: null,
+       mortes: null,
        dados:[
            
        ],
@@ -57,6 +101,12 @@ export default ({
        deaths:[],
 
        teste:0,
+
+    //variaveis de pais
+    pais: '',
+    dadosPais:[],
+    casosPais: null,
+    mortesPais: null,
        
     }),
     methods: {
@@ -64,10 +114,8 @@ export default ({
         async totalCasos(){
             const response = await fetch('https://covid19-brazil-api.vercel.app/api/report/v1/brazil');
             const data = await response.json();
-            this.casos = data.data.confirmed;
-            this.mortes = data.data.deaths;
-            console.log(data);
-            console.log(this.casos);
+            this.casos = data.data.confirmed.toLocaleString('pt-BR');
+            this.mortes = data.data.deaths.toLocaleString('pt-BR');
             
         },
         //consumo da api por estado
@@ -88,12 +136,19 @@ export default ({
                 this.deaths.push(this.dados[i].deaths);
             }
             
-            console.log("casos: ", this.cases);
-            console.log("mortes: ", this.deaths);
-             console.log("estado: ", this.states);
             
-
-        }
+        },
+        //total por pais
+        async totalPais(){
+            const pais = this.pais.trim();
+            const response = await fetch("https://covid19-brazil-api.vercel.app/api/report/v1/"+pais+"");
+            const dataPais = await response.json();
+            this.casosPais = dataPais.data.confirmed.toLocaleString('pt-BR') 
+            this.mortesPais = dataPais.data.deaths.toLocaleString('pt-BR') 
+            console.log("dados pais", dataPais);
+           
+            
+        },
     },
         
     
@@ -101,5 +156,14 @@ export default ({
 </script>
 
 <style scoped>
+    .dark{
+        background-color: #1e1e1e;
+        color: white;
+    }
+    #div-total{
+        margin: 10px;
+        padding: 10px;
+        margin-top: 20px;
+    }
 
 </style>
