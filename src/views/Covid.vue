@@ -6,19 +6,19 @@
 
     <v-main>
         <v-container >
-            <div class="" id="div-total" >
+            <div class="blue lighten-4" id="div-total" >
                 <v-row >
                     <v-col cols="6">
-                          <v-btn @click="totalCasos"  color="primary" dark>Mostrar total Brasil</v-btn>
+                          <v-btn @click="totalCasos"  color="primary" dark>Dados do Brasil</v-btn>
                             <br>
                             <br>
                             <v-row >
                                 <v-col cols="12" >
-                                    <p >Total de casos: {{casos}}</p>
+                                    <b >Total de casos: {{casos}}</b>
                                     
                                  </v-col>
                                  <v-col cols="12">
-                                     <p >Total de mortes: {{mortes}}</p>
+                                     <b >Total de mortes: {{mortes}}</b>
                                  </v-col>
                             </v-row>    
                     </v-col>
@@ -37,9 +37,11 @@
                             </v-col>
                         </v-row >
                          <!-- <v-text-field color="#E0F7FA" label="Pais" v-model="pais" rounded>{{pais}}</v-text-field> -->
-                       
-                         <p >Total de casos: {{casosPais}}</p>
-                         <p >Total de mortes: {{mortesPais}}</p>
+                        <b>{{nomePAis}}</b>
+                        <br>
+                         <b>Total de casos: {{casosPais}}</b>
+                         <br>
+                         <b >Total de mortes: {{mortesPais}}</b>
                     </v-col>
                 </v-row>
               
@@ -85,9 +87,7 @@
                         <th class="text-center">
                             <h2>Mortes</h2>
                         </th>
-                        <th class="text-center">
-                            <h2>Data de atualização</h2>
-                        </th>
+                        
                         
                         </tr>
                     </thead>
@@ -97,7 +97,7 @@
                             <td>{{ dado.cases.toLocaleString('pt-BR') }}</td>
                             <td>{{ dado.suspects.toLocaleString('pt-BR') }}</td>
                             <td>{{ dado.deaths.toLocaleString('pt-BR') }}</td>
-                            <td>{{ dado.datetime.toLocaleString('pt-BR') }}</td>
+                            
                         </tr>
                     </tbody>
                     </template>
@@ -132,6 +132,7 @@ export default ({
     dadosPais:[],
     casosPais: null,
     mortesPais: null,
+    nomePAis: '',
        
     }),
     methods: {
@@ -147,9 +148,9 @@ export default ({
         async casosPorEstado(){
             const response = await fetch('https://covid19-brazil-api.vercel.app/api/report/v1');
             const data = await response.json();
-            console.log("dadios ", data);
+           
             this.dados = data.data;
-            console.log("array: ",this.dados);
+           
             this.teste = this.dados[1].cases;
             for(let i = 0; i < this.dados.length; i++){
                 this.cases.push(this.dados[i].cases);
@@ -177,9 +178,12 @@ export default ({
                     this.dadosPais = dataPais.data;
                     this.casosPais = dataPais.data.confirmed.toLocaleString('pt-BR');
                     this.mortesPais = dataPais.data.deaths.toLocaleString('pt-BR');
+                    this.nomePAis = dataPais.data.country;
+                    this.pais = '';
                 }
                 catch(e){
                     alert("Pais não encontrado, consulte os paises disponíveis: https://covid19-brazil-api.now.sh/api/report/v1/countries", e);
+                    this.pais = '';
                 }
                 
             }
